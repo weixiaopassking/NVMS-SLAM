@@ -1,0 +1,16 @@
+<launch>
+
+  <arg name="project" default="lio_nvm"/>
+  <!-- <param name="/use_sim_time" value="true" /> -->
+  <arg name="rviz" default="true" />
+
+  <!-- <node pkg="$(arg project)"  type="$(arg project)_normal"  name="$(arg project)_normal"  output="screen" launch-prefix="xterm -e gdb"/> -->
+  <node pkg="$(arg project)" type="$(arg project)_LRU" name="$(arg project)_LRU" output="screen" required="true" 
+    args= "-config_directory $(find lio_nvm)/config">
+  </node>
+
+  <group if="$(arg rviz)">
+    <node launch-prefix="nice" pkg="rviz" type="rviz" name="lio_nvm" args="-d $(find lio_nvm)/launch/lio_nvm.rviz" />
+  </group>
+
+</launch>

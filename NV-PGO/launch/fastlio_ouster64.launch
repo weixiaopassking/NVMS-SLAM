@@ -1,0 +1,76 @@
+<launch>
+    <param name="mapviz_filter_size" type="double" value="0.5"/>
+    <param name="filter_size" type="double" value="0.3"/>  <!-- downSizeFilter -->
+
+    <!-- keyframe -->
+    <param name="keyframe_meter_gap" type="double" value="0.5"/>
+    <param name="keyframe_deg_gap" type="double" value="15"/>    
+    
+
+    <!--Loop Scan Context -->
+    <param name="sc_dist_thres" type="double" value="0.1"/> <!-- if want no outliers, use 0.1-0.15 -->
+    <param name="sc_max_radius" type="double" value="40.0"/> <!-- 80 for outdoor 20 or 40 for indoor --> 
+
+    <!--Similar Scan Context -->
+    <param name="similar_sc_dist_thres" type="double" value="0.17"/> <!-- use  -->
+
+
+    <!--LoopICP -->
+    <param name="loopICPThreshold" type="double" value="0.1"/> <!-- use  -->
+    <param name="loopICP_historyKeyframeSearchNum" type="int" value="3"/>
+
+    <!--Strengthening_LoopICPThreshold -->
+    <param name="capacity_" type="int" value="4000000"/>
+    <param name="max_num_points_in_voxel" type="int" value="20"/>
+    <param name="min_distance_points" type="double" value="0.1"/> 
+    <param name="max_iteration" type="int" value="10"/>
+    <param name="log_print" type="bool" value="0"/>
+    <param name="min_num_residuals" type="int" value="50"/>
+    <param name="weight_alpha" type="double" value="0.9"/> 
+    <param name="weight_neighborhood" type="double" value="0.1"/> 
+    <param name="threshold_voxel_occupancy" type="int" value="1"/> 
+    <param name="voxel_neighborhood" type="int" value="1"/> 
+    <param name="thres_orientation_norm" type="double" value="0.1"/> 
+    <param name="thres_translation_norm" type="double" value="0.01"/>
+    <param name="max_number_neighbors" type="int" value="20"/> 
+    <param name="estimate_normal_from_neighborhood" type="bool" value="1"/>
+    <param name="min_number_neighbors" type="int" value="20"/>
+    <param name="max_num_residuals" type="int" value="1000"/>
+    <param name="num_closest_neighbors" type="int" value="1"/>
+    <param name="power_planarity" type="int" value="2"/>
+    <param name="size_voxel_map" type="double" value="0.4"/> 
+    <param name="max_dist_to_plane_icp" type="double" value="0.15"/> 
+    <param name="surf_res" type="double" value="0.3"/> 
+    <param name="icp_eigval" type="double" value="60"/> 
+    <param name="history_kf_buff" type="int" value="4"/>
+    <param name="overlap_ratio" type="double" value="0.35"/> 
+
+
+    <!--SimilarICP -->
+    <param name="similarICPThreshold" type="double" value="0.07"/> <!-- use  -->
+    <param name="similarICP_historyKeyframeSearchNum" type="int" value="25"/>
+    
+    <!--Strengthening_constraints_ICPThreshold -->
+    <param name="Strengthening_constraints_ICPThreshold" type="double" value="0.6"/> <!-- use  -->
+    <param name="Strengthening_ICP_historyKeyframeSearchNum" type="int" value="3"/>
+
+    
+    <!-- <remap from="/aft_mapped_to_init" to="/lio_odom"/>
+    <remap from="/velodyne_cloud_registered_local" to="normal_scan"/> -->
+    <!-- input from FASTLIO2 -->
+    <remap from="/aft_mapped_to_init" to="/Odometry"/>
+    <remap from="/velodyne_cloud_registered_local" to="/cloud_registered_body"/>
+    <!-- <remap from="/cloud_for_scancontext" to="/cloud_registered_lidar"/>   because ScanContext requires lidar-ego-centric coordinate for the better performance -->
+
+    <param name="sc_density" type="bool" value="0"/>
+    <param name="desc_THRES" type="double" value="10"/> <!-- use  -->
+    <!-- nodes -->
+    <node pkg="aloam_velodyne" type="alaserPGO" name="alaserPGO" output="screen"/> <!-- Scan Context-based PGO -->
+    <node pkg="aloam_velodyne" type="balm" name="balm" output="screen" />
+    <!-- visulaization -->
+    <arg name="rvizscpgo" default="true" />
+    <group if="$(arg rvizscpgo)">
+        <node launch-prefix="nice" pkg="rviz" type="rviz" name="rvizscpgo" args="-d $(find aloam_velodyne)/rviz_cfg/aloam_velodyne.rviz" />
+    </group>
+
+</launch>
